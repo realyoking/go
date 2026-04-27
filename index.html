@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Click Simulator</title>
+    <title>Goon Simulator</title>
     <style>
         body, html {
             margin: 0;
@@ -11,59 +10,114 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
+            font-family: sans-serif;
+            background-image: url('bedroom.jpeg');
+            background-size: cover;
+            background-position: center;
         }
 
-        #videoPlayer {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
         }
 
-        #overlay {
+        /* Coin Counter */
+        #hud {
             position: absolute;
-            z-index: 10;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.6);
             color: white;
-            text-align: center;
-            pointer-events: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+        }
+
+        /* Character */
+        #character {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        #character:active {
+            transform: translate(-50%, -50%) scale(0.95);
+        }
+
+        /* Video Position: Bottom Middle */
+        #video-container {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 320px;
+            border: 4px solid #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            background: black;
+        }
+
+        video {
+            width: 100%;
+            display: block;
         }
 
         .icon {
-            width: 80px;
-            height: 80px;
-            fill: white;
+            width: 30px;
+            height: 30px;
+            fill: gold;
         }
     </style>
 </head>
 <body>
 
-    <div id="overlay">
-        <svg class="icon" viewBox="0 0 24 24">
-            <path d="M8 5v14l11-7z"/>
-        </svg>
-        <p>Click anywhere to play</p>
+    <div id="game-container">
+        <div id="hud">
+            <svg class="icon" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" fill="gold"/>
+            </svg>
+            <span id="coin-count">0</span>
+        </div>
+
+        <img id="character" src="char.jpeg" alt="Game Character">
+
+        <div id="video-container">
+            <video id="gameVideo" loop>
+                <source src="good.mov" type="video/quicktime">
+            </video>
+        </div>
     </div>
 
-    <video id="videoPlayer" playsinline>
-        <source src="good.mov" type="video/quicktime">
-        Your browser does not support the video tag.
-    </video>
-
     <script>
-        const video = document.getElementById('videoPlayer');
-        const overlay = document.getElementById('overlay');
+        let coins = 0;
+        const coinDisplay = document.getElementById('coin-count');
+        const character = document.getElementById('character');
+        const video = document.getElementById('gameVideo');
 
-        document.body.addEventListener('click', function() {
+        // Click character to gain coins
+        character.addEventListener('click', () => {
+            coins++;
+            coinDisplay.innerText = coins;
+            
+            // Trigger video play on click
             if (video.paused) {
                 video.play();
-                overlay.style.display = 'none';
+            }
+        });
+
+        // Optional: Click video to pause/play
+        video.addEventListener('click', () => {
+            if (video.paused) {
+                video.play();
             } else {
                 video.pause();
-                overlay.style.display = 'block';
             }
         });
     </script>
