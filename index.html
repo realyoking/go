@@ -22,19 +22,28 @@
             height: 100vh;
         }
 
-        /* Coin Counter */
+        /* HUD */
         #hud {
             position: absolute;
             top: 20px;
             left: 20px;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.7);
             color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
+            padding: 15px;
+            border-radius: 12px;
             display: flex;
-            align-items: center;
+            flex-direction: column;
             gap: 10px;
-            font-size: 24px;
+        }
+
+        /* Shop Button */
+        #open-shop {
+            background: #ffcc00;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
         }
 
         /* Character */
@@ -47,11 +56,9 @@
             cursor: pointer;
             transition: transform 0.1s;
         }
-        #character:active {
-            transform: translate(-50%, -50%) scale(0.95);
-        }
+        #character:active { transform: translate(-50%, -50%) scale(0.95); }
 
-        /* Video Position: Bottom Middle */
+        /* Video */
         #video-container {
             position: absolute;
             bottom: 20px;
@@ -61,65 +68,112 @@
             border: 4px solid #fff;
             border-radius: 12px;
             overflow: hidden;
-            background: black;
         }
+        video { width: 100%; display: block; }
 
-        video {
-            width: 100%;
-            display: block;
+        /* Shop Modal */
+        #shop-modal {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            width: 300px;
+            text-align: center;
         }
-
-        .icon {
-            width: 30px;
-            height: 30px;
-            fill: gold;
+        .shop-item {
+            border: 1px solid #444;
+            padding: 10px;
+            margin: 10px 0;
+            cursor: pointer;
         }
+        .shop-item:hover { background: #333; }
+        .icon { width: 20px; height: 20px; fill: gold; vertical-align: middle; }
     </style>
 </head>
 <body>
 
     <div id="game-container">
         <div id="hud">
-            <svg class="icon" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" fill="gold"/>
-            </svg>
-            <span id="coin-count">0</span>
+            <div><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg> Coins: <span id="coin-count">0</span></div>
+            <div>Power: <span id="click-power">1</span> per click</div>
+            <button id="open-shop">Open Shop</button>
         </div>
 
         <img id="character" src="char.jpeg" alt="Game Character">
 
         <div id="video-container">
             <video id="gameVideo" loop>
-                <source src="good.mov" type="video/quicktime">
+                <source src="IMG_9302.gif" type="video/quicktime">
             </video>
         </div>
     </div>
 
+    <div id="shop-modal">
+        <h3>Upgrade Shop</h3>
+        <div class="shop-item" onclick="buyUpgrade('power')">
+            <strong>Stronger Click</strong><br>
+            Cost: <span id="cost-power">10</span> Coins
+        </div>
+        <div class="shop-item" onclick="buyUpgrade('auto')">
+            <strong>Auto Gooner</strong><br>
+            Cost: <span id="cost-auto">50</span> Coins
+        </div>
+        <button onclick="document.getElementById('shop-modal').style.display='none'">Close</button>
+    </div>
+
     <script>
         let coins = 0;
+        let clickPower = 1;
+        let autoIncome = 0;
+        let powerCost = 10;
+        let autoCost = 50;
+
         const coinDisplay = document.getElementById('coin-count');
-        const character = document.getElementById('character');
+        const powerDisplay = document.getElementById('click-power');
+        const char = document.getElementById('character');
         const video = document.getElementById('gameVideo');
 
-        // Click character to gain coins
-        character.addEventListener('click', () => {
-            coins++;
+        // Clicking the character
+        char.addEventListener('click', () => {
+            coins += clickPower;
             coinDisplay.innerText = coins;
-            
-            // Trigger video play on click
-            if (video.paused) {
-                video.play();
-            }
+            if (video.paused) video.play();
         });
 
-        // Optional: Click video to pause/play
-        video.addEventListener('click', () => {
-            if (video.paused) {
-                video.play();
-            } else {
-                video.pause();
+        // Shop Logic
+        function buyUpgrade(type) {
+            if (type === 'power' && coins >= powerCost) {
+                coins -= powerCost;
+                clickPower++;
+                powerCost = Math.floor(powerCost * 1.5);
+                document.getElementById('cost-power').innerText = powerCost;
+                powerDisplay.innerText = clickPower;
+            } else if (type === 'auto' && coins >= autoCost) {
+                coins -= autoCost;
+                autoIncome++;
+                autoCost = Math.floor(autoCost * 1.5);
+                document.getElementById('cost-auto').innerText = autoCost;
             }
-        });
+            coinDisplay.innerText = coins;
+        }
+
+        // Auto Income Interval
+        setInterval(() => {
+            if (autoIncome > 0) {
+                coins += autoIncome;
+                coinDisplay.innerText = coins;
+            }
+        }, 1000);
+
+        // UI toggles
+        document.getElementById('open-shop').onclick = () => {
+            document.getElementById('shop-modal').style.display = 'block';
+        };
     </script>
 </body>
 </html>
