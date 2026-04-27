@@ -36,7 +36,6 @@
             gap: 10px;
         }
 
-        /* Shop Button */
         #open-shop {
             background: #ffcc00;
             border: none;
@@ -46,7 +45,7 @@
             font-weight: bold;
         }
 
-        /* Character */
+        /* Character with Shake Animation */
         #character {
             position: absolute;
             top: 40%;
@@ -54,22 +53,34 @@
             transform: translate(-50%, -50%);
             width: 200px;
             cursor: pointer;
-            transition: transform 0.1s;
         }
-        #character:active { transform: translate(-50%, -50%) scale(0.95); }
 
-        /* Video */
-        #video-container {
+        @keyframes shake {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            25% { transform: translate(-50%, -50%) rotate(5deg); }
+            50% { transform: translate(-50%, -50%) rotate(-5deg); }
+            75% { transform: translate(-50%, -50%) rotate(5deg); }
+            100% { transform: translate(-50%, -50%) rotate(0deg); }
+        }
+
+        .shake-animation {
+            animation: shake 0.2s ease-in-out;
+        }
+
+        /* GIF Container (No Border) */
+        #gif-container {
             position: absolute;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            width: 320px;
-            border: 4px solid #fff;
-            border-radius: 12px;
+            width: 450px; /* Increased size */
             overflow: hidden;
         }
-        video { width: 100%; display: block; }
+
+        #gif-container img {
+            width: 100%;
+            display: block;
+        }
 
         /* Shop Modal */
         #shop-modal {
@@ -106,10 +117,8 @@
 
         <img id="character" src="char.jpeg" alt="Game Character">
 
-        <div id="video-container">
-            <video id="gameVideo" loop>
-                <source src="IMG_9302.gif" type="video/quicktime">
-            </video>
+        <div id="gif-container">
+            <img src="IMG_9302.gif" alt="Animated GIF">
         </div>
     </div>
 
@@ -136,16 +145,21 @@
         const coinDisplay = document.getElementById('coin-count');
         const powerDisplay = document.getElementById('click-power');
         const char = document.getElementById('character');
-        const video = document.getElementById('gameVideo');
 
-        // Clicking the character
+        // Character click event with shake
         char.addEventListener('click', () => {
             coins += clickPower;
             coinDisplay.innerText = coins;
-            if (video.paused) video.play();
+            
+            // Add shake class
+            char.classList.add('shake-animation');
+            
+            // Remove class after animation finishes
+            setTimeout(() => {
+                char.classList.remove('shake-animation');
+            }, 200);
         });
 
-        // Shop Logic
         function buyUpgrade(type) {
             if (type === 'power' && coins >= powerCost) {
                 coins -= powerCost;
@@ -162,7 +176,6 @@
             coinDisplay.innerText = coins;
         }
 
-        // Auto Income Interval
         setInterval(() => {
             if (autoIncome > 0) {
                 coins += autoIncome;
@@ -170,7 +183,6 @@
             }
         }, 1000);
 
-        // UI toggles
         document.getElementById('open-shop').onclick = () => {
             document.getElementById('shop-modal').style.display = 'block';
         };
